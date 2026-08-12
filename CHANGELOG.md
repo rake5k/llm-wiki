@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-08-12
+
+### Fixed
+
+- Dashboard templates used `{{NAMESPACES}}` while `setup.sh` substitutes `{{NAMESPACE_LINKS}}`,
+  so a fresh `Wiki/Dashboard` shipped with the literal placeholder instead of the namespace
+  links. Both templates now use `{{NAMESPACE_LINKS}}`; the Logseq template no longer carries
+  its own `- ` bullet, which the generated block already supplies per line.
+
 ## [1.3.0] - 2026-06-08
 
 Routing transparency. The Access-Log already recorded which pages a query pulled; now it
