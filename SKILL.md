@@ -67,7 +67,11 @@ with the wiki root above. The config determines:
 - `tool`: logseq or obsidian
 - `wiki_path`: path to the graph/vault
 - `pages_dir`: where pages live (relative to wiki_path)
-- `memory_path`: L1 memory directory (optional; without it, L1 features are skipped)
+- `memory_path`: L1 memory root (optional; without it, L1 features are skipped). Claude Code memory
+  is PER-PROJECT, so treat this as a pattern, not a leaf dir: the current session's L1 is
+  `<projects-root>/<slug>/memory/`, where `<slug>` is the cwd with every non-alphanumeric char
+  replaced by `-` (`/home/me/work/api` -> `-home-me-work-api`). A `*` in the configured value means
+  all projects — lint scope only
 - `l1_verify_days`: days until an L1 behavior claim is due for re-verification (optional, default 90;
   invalid value -> warn and use 90)
 - `namespaces`: configured top-level namespaces
@@ -166,7 +170,8 @@ Phase 1 - Targeted Read (Stage 2, only the chosen pages):
   - L3 fallback when routing yields nothing useful (namespace unclear, hub index missing/empty, no
     routing line matches): classic grep across all wiki pages -> top 3-5. This is the slow
     backing-store scan and should be the exception, not the default
-  - If needed, also read L1 Memory for complete picture
+  - If needed, also read L1 Memory for complete picture — resolve memory_path to the cwd slug
+    (current project only, never the all-projects glob)
 
 Phase 1b - Access Logging (LRU signal + routing transparency):
   - For each page ACTUALLY read in full, append one line to the Access-Log page (Wiki/Reference/Access-Log):
@@ -310,7 +315,8 @@ Phase 2 - Check Rules (from Schema):
   - Credential Leak: regex scan for token/password/secret patterns
   - Empty Pages: pages with only properties, no content
   - Cross-ref Minimum: pages with fewer than 1 outgoing [[link]]
-  - L1/L2 Duplicates: same info in Memory AND Wiki -> warning
+  - L1/L2 Duplicates: same info in Memory AND Wiki -> warning. Across ALL project memory dirs
+    (expand the memory_path glob); read each dir's `MEMORY.md` index, not every memory file
   - Block Bloat (warning):
     - a block (Obsidian: a paragraph) with > 600 characters of prose outside `History` / `Change log`
       blocks — code blocks, tables and the Access-Log page don't count -> "split into state + history"

@@ -310,7 +310,7 @@ Setup creates `llm-wiki.yml` in your wiki root. You can also create it manually:
 tool: logseq          # or "obsidian"
 wiki_path: ~/Documents/MyWiki/
 pages_dir: pages      # relative to wiki_path
-memory_path: ~/.claude/projects/my-project/memory/
+memory_path: ~/.claude/projects/my-project/memory/   # per-project; `*` = all projects (lint only)
 l1_verify_days: 90    # optional: re-verify L1 behavior claims after N days
 
 namespaces:

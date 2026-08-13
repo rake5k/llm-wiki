@@ -46,6 +46,13 @@ All downstream behavior depends on this file being valid.
 - REQ-620: The config MAY contain the key `memory_path` with a path to the L1
   memory directory. If absent, L1 Memory features (query supplementation,
   L1/L2 duplicate detection, L1 verification) are disabled.
+- REQ-621: Claude Code memory is per-project, so `memory_path` is a pattern, not a
+  leaf directory. The current session's L1 directory SHALL resolve to
+  `<projects-root>/<slug>/memory/`, where `<slug>` is the working directory with every
+  non-alphanumeric character replaced by `-` (`/home/me/work/api` -> `-home-me-work-api`).
+- REQ-622: A `*` in the configured `memory_path` means "all projects". Commands that
+  read L1 for the current session (query) MUST resolve to the cwd slug only; only
+  cross-project checks (lint rule 9) MAY expand the glob.
 - REQ-660: The config MAY contain the key `l1_verify_days`: a positive integer, the
   number of days after which an L1 rule with `asserts-current-behavior: true` is due
   for re-verification (see specs/l1-l2-routing.md REQ-374). Default: 90.
