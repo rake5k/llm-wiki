@@ -32,7 +32,9 @@ knowledge gaps. It is the primary read path — the counterpart to ingest (write
 - REQ-404: The system SHALL load at most 3 pages simultaneously (JIT retrieval).
   If more than 3 are relevant, read in batches.
 - REQ-405: The system SHOULD also read L1 Memory files when the question touches
-  topics that may have operational rules or gotchas stored there.
+  topics that may have operational rules or gotchas stored there. It SHALL resolve
+  `memory_path` to the current project's slug (specs/config.md REQ-621) and MUST NOT
+  read other projects' memory directories.
 
 ### Phase 1b: Access Logging (LRU signal)
 

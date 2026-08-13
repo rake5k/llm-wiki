@@ -25,6 +25,12 @@ one-line write and batches the page writes into a deliberate drain.
 
 ### Changed
 
+- **`memory_path` is a per-project pattern, not a leaf directory.** Claude Code memory lives at
+  `<projects-root>/<cwd-slug>/memory/` (cwd with every non-alphanumeric char replaced by `-`).
+  `query` resolves it to the current project only; a `*` in the configured value means all
+  projects and is used for lint's L1/L2 duplicate check, which now reads each project's
+  `MEMORY.md` index instead of every memory file. Specs: `config.md` REQ-621/622,
+  `query.md` REQ-405, `lint.md` REQ-190.
 - `prune` exempts the Ingest-Inbox from demotion; lint exempts both system pages (Access-Log,
   Ingest-Inbox) from orphan detection and index-drift "unroutable" findings.
 - Specs updated: `ingest.md` (source `inbox`, REQ-015/016, REQ-035a, REQ-064), `schema.md`

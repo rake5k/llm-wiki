@@ -276,7 +276,7 @@ Every number has a date. Decisions have rationale. Open questions are explicit. 
 tool: logseq          # or "obsidian"
 wiki_path: ~/Documents/MyWiki/
 pages_dir: pages      # relative to wiki_path
-memory_path: ~/.claude/projects/my-project/memory/
+memory_path: ~/.claude/projects/my-project/memory/   # per-project; `*` = all projects (lint only)
 
 namespaces:
   - Business

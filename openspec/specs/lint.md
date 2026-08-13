@@ -105,7 +105,10 @@ certain issues when run with the `--fix` flag. There are 11 lint rules.
 ### Rule 9: L1/L2 Duplicates
 
 - REQ-190: The system SHALL compare wiki page content against L1 memory files
-  (at the path specified in `llm-wiki.yml` `memory_path`).
+  (at the path specified in `llm-wiki.yml` `memory_path`). The check spans ALL
+  project memory directories the configured path expands to (see specs/config.md
+  REQ-621/622) and SHALL read each directory's `MEMORY.md` index rather than every
+  memory file.
 - REQ-191: The system SHALL flag cases where substantially the same information
   exists in both L1 memory and L2 wiki.
 - REQ-192: No auto-fix (requires human decision on which location is authoritative).

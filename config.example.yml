@@ -2,7 +2,7 @@
 tool: logseq          # logseq or obsidian
 wiki_path: ~/Documents/MyWiki/
 pages_dir: pages      # relative to wiki_path
-memory_path: ~/.claude/projects/my-project/memory/
+memory_path: ~/.claude/projects/my-project/memory/   # per-project; use */memory/ to lint all projects
 namespaces:
   - Business
   - Tech
