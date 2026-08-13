@@ -1,5 +1,5 @@
 #!/bin/bash
-# Creates the wiki skeleton (Schema, Dashboard, hub pages, Access-Log) and llm-wiki.yml.
+# Creates the wiki skeleton (Schema, Dashboard, hub pages, Access-Log, Ingest-Inbox) and llm-wiki.yml.
 # Non-interactive: all input arrives as flags. Called by setup.sh and by the setup skill.
 set -eo pipefail
 
@@ -176,6 +176,9 @@ for ns in namespaces:
 
 # Access-Log: append-only LRU signal for /llm-wiki prune
 write_file(page("Reference/Access-Log"), read_template("Access-Log.md").replace("{{DATE}}", today))
+
+# Ingest-Inbox: capture queue for /llm-wiki ingest inbox
+write_file(page("Reference/Ingest-Inbox"), read_template("Ingest-Inbox.md").replace("{{DATE}}", today))
 
 config = [
     "# llm-wiki configuration",

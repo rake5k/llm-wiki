@@ -11,6 +11,29 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Documentation and support links in the plugin manifest, shown on the directory listing.
 - Privacy section in the README and a privacy link in the plugin manifest. The section names the optional access to the Claude Code memory directory.
 - Security policy with a private channel for vulnerability reports.
+- **Ingest-Inbox** — new system page `Wiki/Reference/Ingest-Inbox` with an append-only `## Pending`
+  block. One line per durable learning:
+  `<ISO date> -- <Wiki/NS/Page target or ?> -- <fact> -- src: <origin>`. Appending is
+  non-structural (no page operations, no commit) and allowed mid-task.
+- **`/llm-wiki ingest inbox`** — drains the queue: pending lines are grouped by target page (`?`
+  targets are classified at drain time) and run through the normal ingest pipeline. A line is
+  removed only after its fact is written to a page; unwritten lines stay pending, and the queue is
+  never cleared wholesale. An empty queue is a no-op.
+- Ingest-Inbox page templates for Logseq and Obsidian; `scripts/init-wiki.sh` scaffolds the page.
+
+### Changed
+
+- `prune` exempts the Ingest-Inbox from demotion; lint exempts both system pages (Access-Log,
+  Ingest-Inbox) from orphan detection and index-drift "unroutable" findings.
+- Specs updated: `ingest.md` (source `inbox`, REQ-015/016, REQ-035a, REQ-064), `schema.md`
+  (REQ-569a/b Ingest-Inbox page), `prune.md` (REQ-604 exemption), `lint.md` (REQ-111, REQ-194),
+  `setup.md` (REQ-782/784 page list).
+- `docs/schema-reference.md` — new "Ingest-Inbox page" section; README gains a "Capture Inbox" section.
+
+### Notes
+
+- Backward compatible. Existing wikis keep working; create `Wiki/Reference/Ingest-Inbox` from the
+  template (or re-run `setup.sh`, which skips existing pages) to start capturing.
 
 ## [1.7.1] - 2026-10-11
 

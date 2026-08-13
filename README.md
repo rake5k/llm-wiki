@@ -168,6 +168,7 @@ For the full deep-dive, see [docs/l1-l2-architecture.md](docs/l1-l2-architecture
 | Command | Description |
 |---------|-------------|
 | `/llm-wiki ingest <source>` | Process a source (URL, file, text), update 5-15 wiki pages |
+| `/llm-wiki ingest inbox` | Drain the capture queue: pending one-line learnings become pages |
 | `/llm-wiki query <question>` | Two-stage search via hub index, synthesize answer with source attribution |
 | `/llm-wiki prune [--months N]` | LRU-Demote: evict cold pages from the live index (default 6 months) |
 | `/llm-wiki prune --l1` | L1-Verification: classify L1 rules, check due behavior claims against local evidence, re-verify / demote / delete |
@@ -197,6 +198,16 @@ graph LR
 **Phase 4 -- Quality Gate.** Before committing: Do all pages have required properties? Does every page have at least one cross-reference? Are there credential patterns in the content?
 
 **Phase 5 -- Report.** Summary of pages created, updated, cross-references added, and any warnings.
+
+### Capture Inbox
+
+A full ingest rewrites 5-15 pages — too heavy to run in the middle of other work, which is how
+learnings get lost. The **Ingest-Inbox** (`Wiki/Reference/Ingest-Inbox`) splits capture from ingest:
+while working, append one line per durable learning —
+`<date> -- <target page or ?> -- <fact> -- src: <origin>` — and keep going. That write is one line,
+no page operations, no commit. Later, `/llm-wiki ingest inbox` groups the pending lines by target page
+and runs the normal ingest pipeline over them. A line leaves the queue only after its fact is
+written to a page; anything unwritten stays pending, and the queue is never cleared wholesale.
 
 ### Query
 

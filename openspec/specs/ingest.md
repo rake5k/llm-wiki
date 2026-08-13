@@ -12,8 +12,16 @@ A single ingest run targets 5-15 page touches (creates + updates + hub updates).
 
 ### Phase 1: Source Analysis
 
-- REQ-010: The system SHALL accept three source types: URL (fetched via WebFetch),
-  file path (read from disk), and inline text (parsed directly).
+- REQ-010: The system SHALL accept four source types: URL (fetched via WebFetch),
+  file path (read from disk), inline text (parsed directly), and the literal `inbox`
+  (the capture queue, see REQ-015).
+- REQ-015: For source `inbox`, the system SHALL read the `## Pending` section of
+  `Wiki/Reference/Ingest-Inbox` (see specs/schema.md REQ-569a), parse each line as
+  `<ISO date> -- <target page or ?> -- <fact> -- src: <origin>`, group the lines by
+  target page, and treat the grouped facts as the extracted knowledge. A line whose
+  target is `?` SHALL be routed to a page by the normal classification rules (REQ-012).
+- REQ-016: When the `## Pending` section is empty, the system SHALL report the empty
+  queue and stop without touching any page.
 - REQ-011: The system SHALL extract entities, facts, relationships, dates, and
   decisions from the source material.
 - REQ-012: The system SHALL classify extracted knowledge into exactly one of six
@@ -65,6 +73,10 @@ A single ingest run targets 5-15 page touches (creates + updates + hub updates).
 - REQ-035: The system SHALL set the `updated::` property (or YAML `updated` field)
   to today's date on every modified page. The value SHALL be the date only; change
   notes belong in the commit message (hubs: a line in the collapsed `## Change log`).
+- REQ-035a: For source `inbox`, the system SHALL remove a pending line from
+  `Wiki/Reference/Ingest-Inbox` ONLY after the fact it carries has been written to its
+  target page. Lines whose facts were not written SHALL stay in `## Pending`. The system
+  MUST NOT clear the queue wholesale.
 - REQ-036: When a page mentions an entity that has its own wiki page, the system
   SHALL use `[[Wiki/...]]` link syntax instead of plain text.
 - REQ-037: The system SHOULD target 5-15 page touches per ingest. Fewer than 5
@@ -108,6 +120,10 @@ A single ingest run targets 5-15 page touches (creates + updates + hub updates).
   personal notes, other vault content).
 - REQ-061: The system SHALL use ISO 8601 date format (YYYY-MM-DD) for all date
   properties.
+- REQ-064: Capture and ingest SHALL stay separate: appending a line to
+  `Wiki/Reference/Ingest-Inbox` is a non-structural one-line write (no page operations,
+  no git commit) and is allowed mid-task. Turning pending lines into pages SHALL happen
+  only when the user runs `/llm-wiki ingest inbox` — never automatically.
 - REQ-062: When the configured tool is Logseq, every line of wiki content MUST start
   with `- ` (outliner block prefix). Properties MUST use `property:: value` syntax.
 - REQ-063: When the configured tool is Obsidian, properties MUST be in YAML
@@ -252,12 +268,35 @@ AND add "2026-09-28 decided to keep the VM" and, marked (superseded), the old
 AND NOT append a "Status 2026-09-28: ..." sentence to the block's prose
 ```
 
+### Scenario 12: Drain the Ingest-Inbox
+
+```
+GIVEN Wiki/Reference/Ingest-Inbox has two pending lines:
+    "2026-06-07 -- Wiki/Tech/Strapi -- PUT needs documentId, not the numeric id -- src: session"
+    "2026-06-07 -- ? -- Client X moved billing to quarterly -- src: MR !412"
+WHEN the user runs /llm-wiki ingest inbox
+THEN the system SHALL group line 1 under Wiki/Tech/Strapi and classify line 2 to a target page
+AND append the facts to those pages (never overwriting existing blocks)
+AND remove both lines from the `## Pending` section after the pages are written
+AND a line whose fact could not be written SHALL remain in `## Pending`
+```
+
+### Scenario 13: Empty inbox
+
+```
+GIVEN the `## Pending` section of Wiki/Reference/Ingest-Inbox has no lines
+WHEN the user runs /llm-wiki ingest inbox
+THEN the system SHALL report "inbox empty — nothing to drain"
+AND no wiki page SHALL be created or modified
+```
+
 ---
 
 ## Acceptance Criteria
 
 - [ ] All 5 phases execute in order (Analysis, Scan, Operations, Quality Gate, Report)
-- [ ] URL, file path, and inline text sources all work
+- [ ] URL, file path, inline text, and `inbox` sources all work
+- [ ] `ingest inbox` drops a pending line only after its fact is written; empty queue is a no-op
 - [ ] New pages have ALL required properties per Schema
 - [ ] No existing content is deleted — new facts are appended, superseded state moves to a collapsed `History`
 - [ ] `updated::` carries the date only
