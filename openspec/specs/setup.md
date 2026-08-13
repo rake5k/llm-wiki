@@ -93,10 +93,13 @@ skill for Claude Code. It requires only bash, python3, and git.
   - Schema page (from `Schema.md` template)
   - Dashboard page (from `Dashboard.md` template)
   - One Hub page per namespace (from `Hub.md` template)
+  - Access-Log page `Wiki/Reference/Access-Log` (from `Access-Log.md` template)
+  - Ingest-Inbox page `Wiki/Reference/Ingest-Inbox` (from `Ingest-Inbox.md` template)
 - REQ-783: For Logseq: all pages created flat in `pages/` directory with
   triple-underscore naming (`Wiki___Schema.md`, `Wiki___Tech.md`, etc.).
 - REQ-784: For Obsidian: Schema and Dashboard in `Wiki/` directory.
   Hub pages in `Wiki/<Namespace>/_index.md` with directory creation.
+  Access-Log and Ingest-Inbox in `Wiki/Reference/`.
 - REQ-785: The system SHALL create parent directories as needed (`mkdir -p`).
 - REQ-786: The system SHALL NOT overwrite existing pages. If a page already
   exists, the system SHOULD skip it with a warning.
@@ -154,7 +157,8 @@ WHEN the user runs ./setup.sh and:
     - Enters "~/myproject" for skill installation
 THEN the system SHALL:
     - Create ~/Documents/TestWiki/pages/
-    - Create 9 pages: Schema, Dashboard, 7 hub pages (one per default namespace)
+    - Create 11 pages: Schema, Dashboard, 7 hub pages (one per default namespace),
+      Access-Log, Ingest-Inbox
     - Create llm-wiki.yml with all settings
     - Initialize git with .gitignore
     - Copy wiki.md to ~/myproject/.claude/commands/wiki.md with patched config path
@@ -177,6 +181,7 @@ THEN the system SHALL:
     - Create Wiki/ directory inside the vault
     - Create Schema.md and Dashboard.md in Wiki/
     - Create 7 namespace directories with _index.md hub pages
+    - Create Access-Log.md and Ingest-Inbox.md in Wiki/Reference/
     - Create llm-wiki.yml (no memory_path)
     - Skip git init (already exists)
     - Create git commit with new files
@@ -273,7 +278,7 @@ AND the system SHOULD display: "Wiki___Schema.md already exists, skipping"
 - [ ] Tilde expansion works in all path inputs
 - [ ] Missing directories created with user confirmation
 - [ ] Default namespaces offered, custom list accepted
-- [ ] Template rendering creates Schema, Dashboard, and all Hub pages
+- [ ] Template rendering creates Schema, Dashboard, all Hub pages, Access-Log, and Ingest-Inbox
 - [ ] Logseq: flat files with triple-underscore naming
 - [ ] Obsidian: directory hierarchy with _index.md hub files
 - [ ] Config file generated with all required keys
@@ -287,7 +292,7 @@ AND the system SHOULD display: "Wiki___Schema.md already exists, skipping"
 
 ## Dependencies
 
-- Templates must exist: `templates/logseq/{Schema,Hub,Dashboard}.md` and
-  `templates/obsidian/{Schema,Hub,Dashboard}.md`
+- Templates must exist: `templates/logseq/{Schema,Hub,Dashboard,Access-Log,Ingest-Inbox}.md` and
+  `templates/obsidian/{Schema,Hub,Dashboard,Access-Log,Ingest-Inbox}.md`
 - specs/config.md defines the format of the generated `llm-wiki.yml`
 - specs/schema.md defines what the generated Schema page contains

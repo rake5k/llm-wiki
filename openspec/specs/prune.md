@@ -29,8 +29,8 @@ does NOT self-schedule; the user wires it via their own scheduler.
 - REQ-603: The cold threshold SHALL be "no access in N months", where N defaults to 6
   and is overridable via `--months N`.
 - REQ-604: The system SHALL EXEMPT from demotion: hub pages (type hub), the Schema page,
-  the Dashboard page, the Access-Log page, and any page with `status:: active` that is
-  a project (in-flight work is never evicted, even if unread).
+  the Dashboard page, the Access-Log page, the Ingest-Inbox page, and any page with
+  `status:: active` that is a project (in-flight work is never evicted, even if unread).
 
 ### Phase 2: Demote Candidates
 
@@ -140,7 +140,7 @@ AND keep the file at Wiki/Tech/Legacy-Foo.md (no move)
 
 - [ ] Last-access computed from the Access-Log; created:: used as proxy when never logged
 - [ ] Default 6-month threshold, overridable via --months N
-- [ ] Hubs, Schema, Dashboard, Access-Log, and active projects are exempt
+- [ ] Hubs, Schema, Dashboard, Access-Log, Ingest-Inbox, and active projects are exempt
 - [ ] Candidates shown to the user before any write (opt-in)
 - [ ] Demote adds archived:: (and status:: archived only where the enum allows)
 - [ ] Routing line moved from `### Index` to `### Archive` (move, not delete)

@@ -203,6 +203,11 @@ if tool == "logseq":
     if write_file(os.path.join(pages_path, "Wiki___Reference___Access-Log.md"), access_log):
         print(f"  Created: Wiki/Reference/Access-Log")
 
+    # Ingest-Inbox (capture queue for /wiki ingest inbox)
+    inbox = read_template("Ingest-Inbox.md").replace("{{DATE}}", today)
+    if write_file(os.path.join(pages_path, "Wiki___Reference___Ingest-Inbox.md"), inbox):
+        print(f"  Created: Wiki/Reference/Ingest-Inbox")
+
 else:
     wiki_dir = os.path.join(wiki_path, "Wiki")
     os.makedirs(wiki_dir, exist_ok=True)
@@ -238,6 +243,11 @@ else:
     access_log = read_template("Access-Log.md").replace("{{DATE}}", today)
     if write_file(os.path.join(ref_dir, "Access-Log.md"), access_log):
         print(f"  Created: Wiki/Reference/Access-Log.md")
+
+    # Ingest-Inbox (capture queue for /wiki ingest inbox)
+    inbox = read_template("Ingest-Inbox.md").replace("{{DATE}}", today)
+    if write_file(os.path.join(ref_dir, "Ingest-Inbox.md"), inbox):
+        print(f"  Created: Wiki/Reference/Ingest-Inbox.md")
 
 PYEOF
 

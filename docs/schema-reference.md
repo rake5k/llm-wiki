@@ -528,6 +528,17 @@ the index description or grep term that selected the page — so the log records
 loaded but WHY (routing transparency, surfaced by `/wiki status`). Legacy lines without `matched:`
 remain valid; the suffix does not affect prune/status parsing.
 
+### Ingest-Inbox page
+
+`Wiki/Reference/Ingest-Inbox` (`ingest-inbox:: true`, `type:: reference`) holds an append-only
+`## Pending` block — the capture queue drained by `/wiki ingest inbox`. One line per durable
+learning: `<ISO date> -- <Wiki/NS/Page target or ?> -- <one-sentence fact> -- src: <origin>`.
+Target `?` means the namespace is unclear; the drain decides the page. Capture is a one-line,
+non-structural write allowed mid-task; the drain is user-invoked and never automatic, and removes
+a line only after its fact is written to a page. Like the Access-Log, this page is exempt from the
+orphan, stale, index-drift, and demote rules. Never capture credentials here (the wiki is
+git-tracked), and keep L1-class quick rules in memory.
+
 ### Related lint rules
 
 - **Index Drift** — a routing line with no matching page (orphaned), or an active page with no routing

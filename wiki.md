@@ -19,6 +19,7 @@ Persistent knowledge management powered by Claude Code. Maintains a structured w
 
 ```
 /wiki ingest <source>        Process source, create/update wiki pages
+/wiki ingest inbox           Drain Wiki/Reference/Ingest-Inbox: captured lines -> pages
 /wiki query <question>       Search wiki (two-stage via hub index), synthesize answer
 /wiki prune [--months N]     LRU-Demote: evict cold pages from the live index (default 6 months)
 /wiki lint [--fix]           Health check: orphans, stale, broken refs, index drift
@@ -77,6 +78,11 @@ Read `llm-wiki.yml` from the wiki root directory FIRST to determine:
 
 Phase 1 - Source Analysis:
   - Identify source type (URL -> WebFetch, file path -> Read, text -> parse directly)
+  - Source `inbox` -> read the `## Pending` lines of Wiki/Reference/Ingest-Inbox (capture queue,
+    one durable learning per line: `<date> -- <target or ?> -- <fact> -- src: <origin>`), group
+    them by target page, and treat the group as the extracted facts. Empty queue -> stop, report it.
+    Drop the drained lines from the inbox in Phase 3, only for facts actually written to a page —
+    an unwritten line stays pending. Never clear the queue wholesale
   - Extract: entities, facts, relationships, dates, decisions
   - Classify: business, technical, content, project, learning, reference
   - L1/L2 Check: Is this a quick rule/gotcha? -> Recommend Memory. Deep knowledge? -> Wiki
@@ -97,6 +103,8 @@ Phase 3 - Page Operations (target: 5-15 page touches):
     key for query Phase 0 — keep it terse, distinctive, no filler ("Notes about ...").
   - Add [[cross-references]] between all affected pages
   - Set updated:: property (or YAML updated field) on all modified pages
+  - Inbox drain (source `inbox` only): once a target page is written, remove exactly the pending
+    lines whose facts landed on it; lines not written stay in `## Pending`
 
 Phase 4 - Quality Gate:
   - All new pages have required properties (per Schema)?
@@ -164,7 +172,7 @@ Phase 1 - Access Profile:
   - Read the Access-Log page (Wiki/Reference/Access-Log)
   - Determine last access per page (newest log entry; never logged -> use created:: as a proxy)
   - Threshold: no access in N months (default 6, via --months N)
-  - EXEMPT from demotion: hub pages (type hub), Schema, Dashboard, the Access-Log itself, and
+  - EXEMPT from demotion: hub pages (type hub), Schema, Dashboard, Access-Log, Ingest-Inbox, and
     status:: active projects (never evict in-flight work, even if unread)
 
 Phase 2 - Demote Candidates:
@@ -351,6 +359,41 @@ Rules:
 - prune/status parse the date + `[[page]]` from fixed positions (split on ` -- `); the `matched:` suffix is
   irrelevant to LRU aggregation and does not affect parsing
 - This page is exempt from orphan / stale / demote rules
+
+## Ingest-Inbox (format)
+
+Page: `Wiki/Reference/Ingest-Inbox` (`Wiki___Reference___Ingest-Inbox.md` / `Wiki/Reference/Ingest-Inbox.md`)
+— the capture queue drained by `ingest inbox`, one durable learning per line:
+
+Logseq:
+```
+- ingest-inbox:: true
+- type:: reference
+- ## Pending (append-only, newest at bottom)
+  - 2026-06-07 -- Wiki/Tech/Strapi -- PUT needs documentId, not the numeric id -- src: session strapi-migration
+  - 2026-06-07 -- ? -- Client X moved billing to quarterly -- src: MR !412
+```
+
+Obsidian:
+```
+---
+ingest-inbox: true
+type: reference
+---
+## Pending (append-only, newest at bottom)
+- 2026-06-07 -- Wiki/Tech/Strapi -- PUT needs documentId, not the numeric id -- src: session strapi-migration
+- 2026-06-07 -- ? -- Client X moved billing to quarterly -- src: MR !412
+```
+
+Rules:
+- Line format: `<ISO date> -- <Wiki/NS/Page target or ?> -- <one-sentence fact> -- src: <repo / MR / URL / session>`
+- Append one line per durable learning while working (a decision + rationale, an architecture or ops fact,
+  a domain rule, a dead end worth not repeating). Nothing durable -> capture nothing; a queue of trivia is
+  worse than an empty one
+- Target `?` = namespace unclear; `ingest inbox` decides the page at drain time
+- NEVER capture credentials (the wiki is git-tracked). Quick rules/gotchas belong in L1 memory, not here
+- A line leaves the queue only after its fact is written to a page and committed — never clear wholesale
+- This page is exempt from orphan / stale / demote rules
 </formats>
 
 <constraints>
@@ -360,6 +403,9 @@ Rules:
 - LRU-Demote evicts from the index ONLY — it NEVER renames pages or moves files. The tool links by
   page name; a move would break every incoming [[link]]. Demote = routing line out + archived:: marker
   (status:: archived too, for entity pages); the file stays in place and stays greppable (L3)
+- Capture and ingest are separate: appending a learning to Wiki/Reference/Ingest-Inbox is a
+  one-line, non-structural write (no commit, no page ops, allowed mid-task). Turning those lines
+  into pages is `ingest inbox` — user-invoked, never triggered on its own
 - The Access-Log append is non-structural — NO git commit per query; it rides along with the next
   prune/lint/ingest commit (avoids read-churn in the git-tracked wiki)
 - Every active page belongs in exactly one hub `### Index` — ingest sets the routing line, else the page

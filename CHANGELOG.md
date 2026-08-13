@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-08-13
+
+Capture split from ingest. A full ingest rewrites 5-15 pages, so it never fits into the middle of
+another task — and the learning is gone by the time the task ends. The Ingest-Inbox makes capture a
+one-line write and batches the page writes into a deliberate drain.
+
+### Added
+
+- **Ingest-Inbox** — new system page `Wiki/Reference/Ingest-Inbox` with an append-only `## Pending`
+  block. One line per durable learning:
+  `<ISO date> -- <Wiki/NS/Page target or ?> -- <fact> -- src: <origin>`. Appending is
+  non-structural (no page operations, no commit) and allowed mid-task.
+- **`/wiki ingest inbox`** — drains the queue: pending lines are grouped by target page (`?` targets
+  are classified at drain time) and run through the normal ingest pipeline. A line is removed only
+  after its fact is written to a page; unwritten lines stay pending, and the queue is never cleared
+  wholesale. An empty queue is a no-op.
+- Ingest-Inbox page templates for Logseq and Obsidian; `setup.sh` scaffolds the page.
+
+### Changed
+
+- `prune` exempts the Ingest-Inbox from demotion; lint exempts both system pages (Access-Log,
+  Ingest-Inbox) from orphan detection and index-drift "unroutable" findings.
+- Specs updated: `ingest.md` (source `inbox`, REQ-015/016, REQ-035a, REQ-064), `schema.md`
+  (REQ-569a/b Ingest-Inbox page), `prune.md` (REQ-604 exemption), `lint.md` (REQ-111, REQ-194),
+  `setup.md` (REQ-782/784 page list — now also documents the Access-Log page setup.sh already created).
+- `docs/schema-reference.md` — new "Ingest-Inbox page" section; README gains a "Capture Inbox" section.
+
+### Notes
+
+- Backward compatible. Existing wikis keep working; create `Wiki/Reference/Ingest-Inbox` from the
+  template (or re-run `setup.sh`, which skips existing pages) to start capturing.
+
 ## [1.3.1] - 2026-08-12
 
 ### Fixed

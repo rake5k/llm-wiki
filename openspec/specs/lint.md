@@ -25,7 +25,8 @@ certain issues when run with the `--fix` flag. There are 11 lint rules.
 
 - REQ-110: The system SHALL flag pages with 0 incoming `[[Wiki/...]]` links
   from other wiki pages.
-- REQ-111: Hub pages (type:: hub) SHALL be exempt from orphan detection.
+- REQ-111: Hub pages (type:: hub) and the system pages `Wiki/Reference/Access-Log` and
+  `Wiki/Reference/Ingest-Inbox` SHALL be exempt from orphan detection.
 - REQ-112: Auto-fix (--fix): The system SHALL add the orphan page to its
   namespace's hub page.
 
@@ -114,7 +115,9 @@ certain issues when run with the `--fix` flag. There are 11 lint rules.
 - REQ-193: The system SHALL flag a routing line in a hub `### Index` whose target
   page does not exist on disk (orphaned routing line).
 - REQ-194: The system SHALL flag an active (non-archived) page that has no routing
-  line in its namespace hub `### Index` (unroutable — only findable via L3 grep).
+  line in its namespace hub `### Index` (unroutable — only findable via L3 grep). The
+  system pages `Wiki/Reference/Access-Log` and `Wiki/Reference/Ingest-Inbox` are exempt
+  (they are machine-written queues, not retrieval targets).
 - REQ-195: The system SHALL flag a routing line that has no description text after
   the `--` separator (a routing key cannot be empty).
 - REQ-196: Auto-fix (--fix): for an unroutable page, the system SHALL backfill a

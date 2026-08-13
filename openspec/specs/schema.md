@@ -123,6 +123,17 @@ lint (validation).
   block. `/wiki query` appends one line per full-page read; `/wiki prune` reads it to
   compute last-access per page. This page is EXEMPT from orphan, stale, and demote rules.
 
+### Ingest-Inbox Page
+
+- REQ-569a: The wiki SHALL contain a system page `Wiki/Reference/Ingest-Inbox` with properties
+  `ingest-inbox:: true` and `type:: reference`, holding an append-only `## Pending` block. Each
+  line is one durable learning, formatted
+  `<ISO date> -- <Wiki/NS/Page target or ?> -- <one-sentence fact> -- src: <origin>`.
+  `/wiki ingest inbox` drains it (see specs/ingest.md REQ-015). This page is EXEMPT from orphan,
+  stale, and demote rules.
+- REQ-569b: Inbox lines MUST NOT contain credentials (the wiki is git-tracked) and SHOULD NOT
+  carry L1-class quick rules or gotchas, which belong in memory (see specs/l1-l2-routing.md).
+
 ### Date Validation
 
 - REQ-560: All date properties MUST use ISO 8601 format: `YYYY-MM-DD`.
