@@ -120,6 +120,27 @@ Restart Claude Code for the skill to be picked up.
 
 Never commit around the lint by force. The false positive rate is low, and genuine credential leaks have serious consequences.
 
+## Git (Concurrent Writers)
+
+### A `/llm-wiki` commit contains page edits I made in Logseq/Obsidian, not the ingest
+
+**Cause:** A whole-tree stage (`git add -A`, `git add .`, `git commit -a`) in a repo with more than one writer. A wiki graph is typically written by several actors at once: `/llm-wiki` in this session, `/llm-wiki` in another Claude Code session, a Logseq/Obsidian git plugin auto-committing on a timer, and you editing in the app.
+
+**Fix:**
+
+- Every `/llm-wiki` command, `setup` included, stages only the paths it wrote, by explicit pathspec (`git add -- <page>` / `git commit -m "…" -- <page>`), so your in-progress edits stay unstaged. See `openspec/specs/git.md`.
+- To split an already-mixed commit: `git revert <sha>`, then re-commit the wiki pages by pathspec. Do not `git reset` (see below).
+
+### A commit from another session disappeared
+
+**Cause:** A history rewrite — `git reset --soft HEAD~1`, `git commit --amend`, or a force-push — while another writer had committed on top. The rewrite drops that commit from the branch.
+
+**Fix:**
+
+1. Recover it from the reflog: `git reflog` → find the lost SHA → `git cherry-pick <sha>` (or `git reset --hard <sha>` only if nothing else has landed since).
+2. Stop rewriting history in the wiki repo. `/llm-wiki` never does (`openspec/specs/git.md` REQ-920); correct a bad commit with a new commit, or `git revert`.
+3. The reflog is the only recovery path here — do not run `git reflog expire` or `git gc --prune=now` in the wiki repo while a loss is unresolved.
+
 ## Wiki Growth
 
 ### The wiki has grown past 200 pages and feels unmanageable

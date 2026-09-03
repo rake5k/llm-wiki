@@ -177,7 +177,8 @@ certain issues when run with the `--fix` flag. There are 13 lint rules.
 - REQ-202: For each finding, the system SHALL report: page name, rule violated,
   severity, and suggested fix.
 - REQ-203: After auto-fix (--fix), the system SHALL output what was changed and
-  recommend a git commit.
+  recommend a git commit of the fixed pages only, by explicit pathspec (see
+  specs/git.md).
 
 ### Dashboard
 

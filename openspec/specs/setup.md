@@ -152,7 +152,8 @@ bundled templates and writes the files itself. No script is involved.
 
 - REQ-810: If the wiki root is a git repository (initialized in Step 6 or before) and
   this run created at least one file, setup SHALL stage exactly the created files by path
-  (`git -C <root> add -- <paths>`) and commit them. It MUST NOT stage anything else.
+  (`git -C <root> add -- <paths>`) and commit them. It MUST NOT stage anything else
+  (see specs/git.md REQ-930-932).
 - REQ-811: The commit message SHALL be:
 
   ```

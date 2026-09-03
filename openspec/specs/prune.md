@@ -61,8 +61,9 @@ and plain `/llm-wiki prune` does NOT touch L1.
 - REQ-620: The system SHALL report the demoted list, the new live-index size per
   namespace, and the hot pages (top access count) for contrast.
 - REQ-621: The system SHALL create a git commit for the structural change (hub index
-  edits + page property changes). This commit also carries any pending Access-Log
-  appends (which are non-structural and not committed per-query).
+  edits + page property changes), staging those paths by explicit pathspec per
+  specs/git.md. This commit also carries any pending Access-Log appends (which are
+  non-structural and not committed per-query).
 - REQ-622: The system SHALL note when the next prune is due (N months out). It MUST NOT
   create a scheduler entry itself.
 

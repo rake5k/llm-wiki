@@ -112,7 +112,9 @@ A single ingest run targets 5-15 page touches (creates + updates + hub updates).
   pages updated, cross-references added, hub pages updated.
 - REQ-051: The system SHALL list any warnings (low page-touch count, L1 candidates
   found, skipped items) and their reasons.
-- REQ-052: The system SHOULD recommend a git commit after structural changes.
+- REQ-052: The system SHOULD recommend a git commit after structural changes. The commit
+  SHALL stage only the pages listed in the summary, by explicit pathspec — see
+  specs/git.md (the wiki repo has concurrent writers).
 
 ### Cross-Cutting
 
