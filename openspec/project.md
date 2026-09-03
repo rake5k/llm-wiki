@@ -45,6 +45,8 @@ inspired by CPU memory hierarchies.
 - Max 3 wiki pages loaded simultaneously (LLM context budget)
 - Credentials MUST stay in L1 (L2 is git-tracked)
 - No deletion: new facts are appended, superseded state moves to a collapsed History
+- The wiki repo has concurrent writers (other sessions, git plugins, the user in the app):
+  commit by explicit pathspec, never `git add -A`, never rewrite history (see specs/git.md)
 
 ## Specs
 
@@ -59,4 +61,5 @@ inspired by CPU memory hierarchies.
 | specs/setup.md | setup.sh interactive installer, page and config creation | 49 | 11 |
 | specs/plugin.md | Plugin manifest, marketplace, root skill `/llm-wiki`, init script | 28 | 6 |
 | specs/l1-l2-routing.md | L1/L2 boundary decision logic, L1 staleness | 40 | 11 |
-| **Total** | **Complete system coverage** | **348** | **104** |
+| specs/git.md | Commit safety in a repo with concurrent writers | 12 | 3 |
+| **Total** | **Complete system coverage** | **360** | **107** |

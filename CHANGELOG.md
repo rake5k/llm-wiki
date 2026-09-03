@@ -20,6 +20,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   removed only after its fact is written to a page; unwritten lines stay pending, and the queue is
   never cleared wholesale. An empty queue is a no-op.
 - Ingest-Inbox page templates for Logseq and Obsidian; `scripts/init-wiki.sh` scaffolds the page.
+- `openspec/specs/git.md` — commit-safety spec (REQ-900..932) covering staging, working-tree
+  awareness, history, and setup. Referenced from `ingest.md` REQ-052, `prune.md` REQ-621,
+  `lint.md` REQ-203, `setup.md` REQ-810.
+- `docs/troubleshooting.md` — new "Git (Concurrent Writers)" section: mixed-in foreign edits, and
+  reflog recovery of a commit lost to a rewrite.
+
+### Fixed
+
+- **Commits use explicit pathspecs.** `ingest`, `prune`, `lint --fix`, and `import` stage only the
+  pages they wrote (`git add -- <page> …` then `git commit -m "…" -- <page> …`, which also keeps
+  foreign staged content out of the commit). `git add -A`, `git add .`, and `git commit -a` are
+  forbidden in the wiki repo, which has concurrent writers.
+- **No history rewrites.** `git reset`, `git commit --amend`, rebase, and force-push are forbidden:
+  another session may have committed on top since the last look. A bad commit is corrected by a new
+  commit (`git revert`).
+- **Foreign changes are left alone.** Commands check `git status --porcelain`, leave paths they did
+  not write unstaged, and report them. They never require, stash, or revert to get a clean tree.
 
 ### Changed
 

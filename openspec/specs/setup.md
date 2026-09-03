@@ -145,8 +145,10 @@ them on.
 ### Step 11: Initial Git Commit
 
 - REQ-810: If git was initialized (Step 6) or `.git` already existed, the
-  system SHALL create an initial commit with the files this run created. It
-  MUST NOT stage other changes present in the wiki directory.
+  system SHALL create an initial commit containing exactly the files it created,
+  staged by explicit pathspec from its created-file manifest (see specs/git.md
+  REQ-930/931/932). Files skipped as already existing SHALL NOT be staged, and no
+  commit SHALL be made when nothing was created.
 - REQ-811: The commit message SHALL include: tool name, namespace count,
   and a link to the GitHub repository.
 - REQ-812: A failed commit SHALL NOT abort the setup; the system SHALL print a
