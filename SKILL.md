@@ -33,6 +33,7 @@ Persistent knowledge management powered by Claude Code. Maintains a structured w
 
 ```
 /llm-wiki ingest <source>        Process source, create/update wiki pages
+/llm-wiki ingest inbox           Drain Wiki/Reference/Ingest-Inbox: captured lines -> pages
 /llm-wiki query <question>       Search wiki (two-stage via hub index), synthesize answer
 /llm-wiki prune [--months N]     LRU-Demote: evict cold pages from the live index (default 6 months)
 /llm-wiki prune --l1 [--batch N] [--days N]
@@ -106,6 +107,8 @@ with the wiki root above. The config determines:
 
 Phase 1 - Source Analysis:
   - Identify source type (URL -> WebFetch, file path -> Read, text -> parse directly)
+  - Source `inbox` -> read the `## Pending` lines of Wiki/Reference/Ingest-Inbox (§ Ingest-Inbox),
+    group them by target page, and treat the group as the extracted facts. Empty queue -> stop, report it
   - Extract: entities, facts, relationships, dates, decisions
   - Classify: business, technical, content, project, learning, reference
   - L1/L2 Check: Is this a quick rule/gotcha? -> Recommend Memory. Deep knowledge? -> Wiki
@@ -132,6 +135,8 @@ Phase 3 - Page Operations (target: 5-15 page touches):
   - Add [[cross-references]] between all affected pages
   - Set updated:: property (or YAML updated field) on all modified pages — **the date only**, no change
     note. What changed belongs in the commit message (hubs: also one line in the collapsed `## Change log`)
+  - Inbox drain (source `inbox` only): once a target page is written, remove exactly the pending
+    lines whose facts landed on it; lines not written stay in `## Pending`, never clear it wholesale
 
 Phase 4 - Quality Gate:
   - All new pages have required properties (per Schema)?
@@ -199,7 +204,7 @@ Phase 1 - Access Profile:
   - Read the Access-Log page (Wiki/Reference/Access-Log)
   - Determine last access per page (newest log entry; never logged -> use created:: as a proxy)
   - Threshold: no access in N months (default 6, via --months N)
-  - EXEMPT from demotion: hub pages (type hub), Schema, Dashboard, the Access-Log itself, and
+  - EXEMPT from demotion: hub pages (type hub), Schema, Dashboard, Access-Log, Ingest-Inbox, and
     status:: active projects (never evict in-flight work, even if unread)
 
 Phase 2 - Demote Candidates:
@@ -374,7 +379,7 @@ Phase 4 - Output:
 ## Workflow: setup
 
 One-time. Creates the wiki skeleton in the wiki root: Schema, Dashboard, one hub page per namespace,
-the Access-Log page and `llm-wiki.yml`. You render the bundled templates and write the files
+the Access-Log and Ingest-Inbox pages and `llm-wiki.yml`. You render the bundled templates and write the files
 yourself with the Read and Write tools; `git` runs through Bash. Create nothing besides the files
 listed in Phase 3, and never overwrite an existing file. Do not write a script or an inline
 program (`python3 -c`, heredoc) to do this; use the tools step by step.
@@ -403,8 +408,8 @@ Phase 2 - Ask the user, in one message:
   Validate before writing anything, and ask again on an invalid answer:
   - Tool must be Logseq or Obsidian.
   - Every namespace must match `^[A-Za-z][A-Za-z0-9-]*$`; name the invalid ones.
-  - Read the four templates of the chosen tool (`Schema.md`, `Dashboard.md`, `Hub.md`,
-    `Access-Log.md`). If one cannot be read, stop with the path you tried.
+  - Read the five templates of the chosen tool (`Schema.md`, `Dashboard.md`, `Hub.md`,
+    `Access-Log.md`, `Ingest-Inbox.md`). If one cannot be read, stop with the path you tried.
   - Expand a leading `~` in the memory path to the home directory. Do not check that it exists.
   - git: if the user wants git init or the root is a repository, check `git --version`. Without
     git, warn that the git steps are skipped and continue.
@@ -420,9 +425,10 @@ Phase 3 - Create:
      | Dashboard | `pages/Wiki___Dashboard.md` | `Wiki/Dashboard.md` | `Dashboard.md` |
      | Hub per namespace | `pages/Wiki___<ns>.md` | `Wiki/<ns>/_index.md` | `Hub.md` |
      | Access-Log | `pages/Wiki___Reference___Access-Log.md` | `Wiki/Reference/Access-Log.md` | `Access-Log.md` |
+     | Ingest-Inbox | `pages/Wiki___Reference___Ingest-Inbox.md` | `Wiki/Reference/Ingest-Inbox.md` | `Ingest-Inbox.md` |
      | Config | `llm-wiki.yml` | `llm-wiki.yml` | (below) |
 
-     The Access-Log page is created even when Reference is not one of the namespaces.
+     The Access-Log and Ingest-Inbox pages are created even when Reference is not one of the namespaces.
   4. Check which targets exist with one Bash call (`test -e` per path, relative to the root).
      Existing targets are skipped, whatever their content. Do not rely on the Write tool to refuse.
   5. Git init, only if the user agreed and the root has no `.git`: `git -C "<root>" init`. Then, if
@@ -575,6 +581,40 @@ Rules:
   irrelevant to LRU aggregation and does not affect parsing
 - This page is exempt from orphan / stale / demote rules
 
+## Ingest-Inbox (format)
+
+Page: `Wiki/Reference/Ingest-Inbox` (`Wiki___Reference___Ingest-Inbox.md` / `Wiki/Reference/Ingest-Inbox.md`)
+— the capture queue drained by `ingest inbox`, one durable learning per line:
+
+Logseq:
+```
+- ingest-inbox:: true
+- type:: reference
+- ## Pending (append-only, newest at bottom)
+  - 2026-06-07 -- Wiki/Tech/Strapi -- PUT needs documentId, not the numeric id -- src: session strapi-migration
+  - 2026-06-07 -- ? -- Client X moved billing to quarterly -- src: MR !412
+```
+
+Obsidian:
+```
+---
+ingest-inbox: true
+type: reference
+---
+## Pending (append-only, newest at bottom)
+- 2026-06-07 -- Wiki/Tech/Strapi -- PUT needs documentId, not the numeric id -- src: session strapi-migration
+- 2026-06-07 -- ? -- Client X moved billing to quarterly -- src: MR !412
+```
+
+Rules:
+- Line format: `<ISO date> -- <Wiki/NS/Page target or ?> -- <one-sentence fact> -- src: <repo / MR / URL / session>`
+- Append one line per durable learning while working (a decision + rationale, an architecture or ops fact,
+  a domain rule, a dead end worth not repeating). Nothing durable -> capture nothing; a queue of trivia is
+  worse than an empty one
+- Target `?` = namespace unclear; `ingest inbox` decides the page at drain time
+- NEVER capture credentials (the wiki is git-tracked). Quick rules/gotchas belong in L1 memory, not here
+- This page is exempt from orphan / stale / demote rules
+
 ## State + History (format)
 
 A block that changes over time (a task, a decision, a host's status) shows the **current** state on top
@@ -658,6 +698,9 @@ Rules:
 - LRU-Demote evicts from the index ONLY — it NEVER renames pages or moves files. The tool links by
   page name; a move would break every incoming [[link]]. Demote = routing line out + archived:: marker
   (status:: archived too, for entity pages); the file stays in place and stays greppable (L3)
+- Capture and ingest are separate: appending a learning to Wiki/Reference/Ingest-Inbox is a
+  one-line, non-structural write (no commit, no page ops, allowed mid-task). Turning those lines
+  into pages is `ingest inbox` — user-invoked, never triggered on its own
 - The Access-Log append is non-structural — NO git commit per query; it rides along with the next
   prune/lint/ingest commit (avoids read-churn in the git-tracked wiki)
 - Every active page belongs in exactly one hub `### Index` — ingest sets the routing line, else the page

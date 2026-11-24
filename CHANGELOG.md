@@ -7,6 +7,35 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+Capture split from ingest. A full ingest rewrites 5-15 pages, so it never fits into the middle of
+another task, and the learning is gone by the time the task ends. The Ingest-Inbox makes capture a
+one-line write and batches the page writes into a deliberate drain.
+
+### Added
+
+- **Ingest-Inbox**: system page `Wiki/Reference/Ingest-Inbox` with an append-only `## Pending`
+  block. One line per durable learning:
+  `<ISO date> -- <Wiki/NS/Page target or ?> -- <fact> -- src: <origin>`. Appending is
+  non-structural (no page operations, no commit) and allowed mid-task.
+- **`/llm-wiki ingest inbox`**: drains the queue. Pending lines are grouped by target page (`?`
+  targets are classified at drain time) and run through the normal ingest pipeline. A line is
+  removed only after its fact is written to a page; unwritten lines stay pending, and the queue is
+  never cleared wholesale. An empty queue is a no-op.
+- Ingest-Inbox page templates for Logseq and Obsidian; `/llm-wiki setup` creates the page.
+
+### Changed
+
+- `prune` exempts the Ingest-Inbox from demotion; lint exempts both system pages (Access-Log,
+  Ingest-Inbox) from orphan detection and index-drift "unroutable" findings.
+- Specs: `ingest.md` (source `inbox`, REQ-015/016, REQ-035a, REQ-064, scenarios 12-13),
+  `schema.md` (REQ-569a/b), `prune.md` (REQ-604), `lint.md` (REQ-111, REQ-194), `setup.md`
+  (REQ-770, REQ-782-784, scenarios).
+
+### Migration
+
+- Existing wikis keep working. To start capturing, run `/llm-wiki setup` and ask it to add the
+  missing pages, or create `Wiki/Reference/Ingest-Inbox` from the template.
+
 ## [1.8.2] - 2026-11-23
 
 The plugin directory's policy check flagged v1.8.1 for a download-and-run command in the README,

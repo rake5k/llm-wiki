@@ -3,7 +3,7 @@
 ## Description
 
 `/llm-wiki setup` (or `/wiki setup` in a copied skill) creates the initial pages (Schema,
-Dashboard, one hub page per namespace, Access-Log), the config file `llm-wiki.yml` and, on request,
+Dashboard, one hub page per namespace, Access-Log, Ingest-Inbox), the config file `llm-wiki.yml` and, on request,
 a git repository with a first commit. Claude asks the questions in the conversation, renders the
 bundled templates and writes the files itself. No script is involved.
 
@@ -80,7 +80,8 @@ bundled templates and writes the files itself. No script is involved.
 ### Step 7: Templates
 
 - REQ-770: Templates SHALL be read from `${CLAUDE_PLUGIN_ROOT}/templates/<tool>/`
-  (`Schema.md`, `Dashboard.md`, `Hub.md`, `Access-Log.md`). In a copied skill the placeholder is
+  (`Schema.md`, `Dashboard.md`, `Hub.md`, `Access-Log.md`, `Ingest-Inbox.md`). In a copied skill the
+  placeholder is
   replaced by the path of the repository clone (REQ-807).
 - REQ-771: If a template cannot be read, setup SHALL stop with an error naming the path
   it tried and write nothing. If the path still contains the literal `${CLAUDE_PLUGIN_ROOT}`, the
@@ -101,12 +102,13 @@ bundled templates and writes the files itself. No script is involved.
     newline with no newline after the last line. The prefix is a tab followed by `- ` for Logseq
     and `- ` for Obsidian.
 - REQ-782: Setup SHALL create, in this order: the Schema page, the Dashboard page, one
-  hub page per namespace in the given order, and the Access-Log page under the Reference namespace.
+  hub page per namespace in the given order, and the Access-Log and Ingest-Inbox pages under the
+  Reference namespace.
 - REQ-783: Logseq: all pages flat in `pages/`, named `Wiki___<name>.md`, where every `/`
   in the page name becomes `___` (`pages/Wiki___Schema.md`, `pages/Wiki___Tech.md`,
-  `pages/Wiki___Reference___Access-Log.md`).
+  `pages/Wiki___Reference___Access-Log.md`, `pages/Wiki___Reference___Ingest-Inbox.md`).
 - REQ-784: Obsidian: `Wiki/Schema.md`, `Wiki/Dashboard.md`, `Wiki/<ns>/_index.md` per
-  namespace, `Wiki/Reference/Access-Log.md`.
+  namespace, `Wiki/Reference/Access-Log.md`, `Wiki/Reference/Ingest-Inbox.md`.
 - REQ-785: Parent directories SHALL be created as needed.
 - REQ-786: Setup MUST NOT overwrite an existing file. It SHALL check every target path
   for existence before writing and skip the ones that exist. Relying on the Write tool to refuse is
@@ -180,11 +182,11 @@ bundled templates and writes the files itself. No script is involved.
 GIVEN the plugin is installed with wiki root ~/Documents/TestWiki, which does not exist
 WHEN the user runs /llm-wiki setup and answers Logseq, default namespaces,
      memory path ~/.claude/projects/test/memory/, git init yes
-THEN ~/Documents/TestWiki/pages/ SHALL contain 10 pages: Schema, Dashboard, Access-Log
-     and 7 hub pages
+THEN ~/Documents/TestWiki/pages/ SHALL contain 11 pages: Schema, Dashboard, Access-Log,
+     Ingest-Inbox and 7 hub pages
 AND llm-wiki.yml SHALL contain tool: logseq, pages_dir: pages and the memory path
 AND .gitignore SHALL have the four Logseq entries
-AND git log SHALL show one commit with the 12 created files
+AND git log SHALL show one commit with the 13 created files
 ```
 
 ### Scenario 2: Obsidian, existing vault with git
@@ -196,8 +198,9 @@ WHEN the user runs /llm-wiki setup, accepts the suggested Obsidian, default name
      no memory path
 THEN setup SHALL NOT ask about git
 AND create Wiki/Schema.md, Wiki/Dashboard.md, Wiki/Reference/Access-Log.md,
+    Wiki/Reference/Ingest-Inbox.md,
     7 Wiki/<ns>/_index.md files and llm-wiki.yml with an empty memory_path
-AND commit exactly those 11 files
+AND commit exactly those 12 files
 AND Notes/todo.md SHALL still be uncommitted
 ```
 
@@ -257,8 +260,8 @@ THEN setup SHALL create 3 hub pages:
     - Wiki___Support.md or Wiki/Support/_index.md
 AND the Schema page SHALL list "Wiki/Engineering, Wiki/Sales, Wiki/Support"
 AND llm-wiki.yml SHALL list these 3 namespaces
-AND the Access-Log page SHALL still be created under Wiki/Reference, although Reference is not
-    in the list
+AND the Access-Log and Ingest-Inbox pages SHALL still be created under Wiki/Reference, although
+    Reference is not in the list
 ```
 
 ### Scenario 9: Git init declined
@@ -284,7 +287,7 @@ AND nothing SHALL be written
 GIVEN two empty directories A and B
 WHEN scripts/init-wiki.sh from a checkout of tag v1.7.1 is run for A with --tool <t> and namespaces N
 AND /llm-wiki setup is run for B with tool <t>, namespaces N, no memory path, no git, on the same day
-THEN the file lists of A and B SHALL be identical
+THEN the file lists of A and B SHALL be identical, except that B also has the Ingest-Inbox page
 AND every file SHALL be byte-identical, except in llm-wiki.yml the wiki_path line and the
     trailing space after an empty value (REQ-791)
 (run for t = logseq and t = obsidian, N = default and N = "Engineering Sales Support")
@@ -308,8 +311,8 @@ AND every file SHALL be byte-identical, except in llm-wiki.yml the wiki_path lin
 
 ## Dependencies
 
-- Templates: `templates/logseq/{Schema,Hub,Dashboard,Access-Log}.md` and
-  `templates/obsidian/{Schema,Hub,Dashboard,Access-Log}.md`
+- Templates: `templates/logseq/{Schema,Hub,Dashboard,Access-Log,Ingest-Inbox}.md` and
+  `templates/obsidian/{Schema,Hub,Dashboard,Access-Log,Ingest-Inbox}.md`
 - specs/plugin.md defines the `setup` subcommand (REQ-863-866)
 - specs/config.md defines the wiki root resolution and the format of `llm-wiki.yml`
 - specs/schema.md defines what the generated Schema page contains
