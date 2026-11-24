@@ -67,7 +67,11 @@ with the wiki root above. The config determines:
 - `tool`: logseq or obsidian
 - `wiki_path`: path to the graph/vault
 - `pages_dir`: where pages live (relative to wiki_path)
-- `memory_path`: L1 memory directory (optional; without it, L1 features are skipped)
+- `memory_path`: L1 memory root (optional; without it, L1 features are skipped). Claude Code memory is
+  PER-PROJECT, so treat this as a pattern, not a leaf dir: the current session's L1 is
+  `<projects-root>/<slug>/memory/`, where `<slug>` is the cwd with every non-alphanumeric char replaced
+  by `-` (`/home/me/work/api` -> `-home-me-work-api`). Every L1 read/write uses that directory only;
+  a `*` in the configured value means all projects and is expanded solely by lint L1/L2 Duplicates
 - `l1_verify_days`: days until an L1 behavior claim is due for re-verification (optional, default 90;
   invalid value -> warn and use 90)
 - `namespaces`: configured top-level namespaces
@@ -307,7 +311,8 @@ Phase 2 - Check Rules (from Schema):
   - Credential Leak: regex scan for token/password/secret patterns
   - Empty Pages: pages with only properties, no content
   - Cross-ref Minimum: pages with fewer than 1 outgoing [[link]]
-  - L1/L2 Duplicates: same info in Memory AND Wiki -> warning
+  - L1/L2 Duplicates: same info in Memory AND Wiki -> warning. Reads each project's `MEMORY.md`
+    index, not every memory file
   - Block Bloat (warning):
     - a block (Obsidian: a paragraph) with > 600 characters of prose outside `History` / `Change log`
       blocks — code blocks, tables and the Access-Log page don't count -> "split into state + history"
