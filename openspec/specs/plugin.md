@@ -94,7 +94,7 @@ Reason: Anthropic's plugin directory accepts other files only from Verified orga
 - REQ-873: The skill's behavior MUST NOT depend on frontmatter keys opencode ignores (`name`,
   `argument-hint`); opencode reads only `description` from a command file.
 - REQ-874: Under opencode, `memory_path` SHALL keep naming Claude Code's memory directory, resolved
-  by the same cwd slug (config.md REQ-621). The skill MUST NOT claim that opencode loads it.
+  by the same cwd slug (config.md REQ-621).
 - REQ-875: The README SHALL describe the opencode install in prose (REQ-835b) and link the opencode
   commands documentation.
 

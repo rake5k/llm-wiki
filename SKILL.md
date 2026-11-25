@@ -60,11 +60,10 @@ Wiki maintainer for a personal or team knowledge base. You process source materi
 
 Wiki root: `${user_config.wiki_path}`
 
-The wiki root above is set by the plugin's "Wiki root" option, or written in by hand for a copied
-skill or opencode command. If it is not a filesystem path but an unexpanded placeholder (it starts
-with a dollar sign and a brace), stop and tell the user: "Wiki root is not configured. Set it in the
-llm-wiki plugin settings, or replace the placeholder in a copied skill or opencode command (see
-README)." Never guess a wiki root.
+The wiki root above is set by the plugin's "Wiki root" option, or written in by hand in a copied
+file. If it is not a filesystem path but an unexpanded placeholder (it starts with a dollar sign and
+a brace), stop and tell the user: "Wiki root is not configured. Set it in the llm-wiki plugin
+settings, or replace the placeholder in the copied file (see README)." Never guess a wiki root.
 
 Read `llm-wiki.yml` from the wiki root FIRST (every command except `setup`, which creates it). If the
 file is missing, stop with: "llm-wiki.yml not found in <wiki root>. Run /llm-wiki setup to create one." If its `wiki_path`
@@ -77,9 +76,7 @@ with the wiki root above. The config determines:
   PER-PROJECT, so treat this as a pattern, not a leaf dir: the current session's L1 is
   `<projects-root>/<slug>/memory/`, where `<slug>` is the cwd with every non-alphanumeric char replaced
   by `-` (`/home/me/work/api` -> `-home-me-work-api`). Every L1 read/write uses that directory only;
-  a `*` in the configured value means all projects and is expanded solely by lint L1/L2 Duplicates.
-  Under opencode it still names Claude Code's memory, resolved by the same slug rule; opencode does
-  not load it on its own
+  a `*` in the configured value means all projects and is expanded solely by lint L1/L2 Duplicates
 - `l1_verify_days`: days until an L1 behavior claim is due for re-verification (optional, default 90;
   invalid value -> warn and use 90)
 - `namespaces`: configured top-level namespaces
@@ -160,8 +157,7 @@ Phase 4 - Quality Gate:
 Phase 5 - Report + Commit:
   - Summary: pages created, pages updated, cross-refs added
   - List any warnings or skipped items
-  - Git commit, staging ONLY the pages listed in that summary by explicit pathspec (see Constraints:
-    the wiki has concurrent writers — `git add -A` would commit their in-progress edits)
+  - Git commit — explicit pathspecs of the pages listed in that summary only (see Constraints)
 
 ## Workflow: query
 
@@ -408,9 +404,9 @@ Phase 1 - Check:
   - If the wiki root exists and is not a directory: stop with an error naming the path.
   - Templates live in `${CLAUDE_PLUGIN_ROOT}/templates/logseq/` and
     `${CLAUDE_PLUGIN_ROOT}/templates/obsidian/`. If that path still starts with a dollar sign and a
-    brace, stop and tell the user: "This is a copied skill or opencode command and the clone path
-    is not filled in. Replace the CLAUDE_PLUGIN_ROOT placeholder in the copied file with the path
-    of your llm-wiki clone (see the README)."
+    brace, stop and tell the user: "This is a copied file and the clone path is not filled in.
+    Replace the CLAUDE_PLUGIN_ROOT placeholder in the copied file with the path of your llm-wiki
+    clone (see the README)."
 
 Phase 2 - Ask the user, in one message:
   - Tool: Logseq or Obsidian. If the wiki root contains a `logseq/` directory suggest Logseq, if it

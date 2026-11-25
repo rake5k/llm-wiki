@@ -99,10 +99,9 @@ The rest of this README writes `/llm-wiki <command>`. With a copied skill, type 
 
 The same `SKILL.md` runs as an [opencode command](https://opencode.ai/docs/commands/). Keep a local
 copy of this repository as above and copy `SKILL.md` to `~/.config/opencode/commands/llm-wiki.md`
-(all projects) or to `.opencode/commands/llm-wiki.md` in one project. Replace the same two
-placeholders as for a copied skill: `${user_config.wiki_path}` with your wiki root and
-`${CLAUDE_PLUGIN_ROOT}` with your local copy. The file name is the command name, so the copy is
-invoked as `/llm-wiki <command>`.
+(all projects) or to `.opencode/commands/llm-wiki.md` in one project, and replace the two
+placeholders as described above. The file name is the command name, so the copy is invoked as
+`/llm-wiki <command>`.
 
 `memory_path` keeps pointing at Claude Code's memory directory. In opencode, `query`, `lint` and
 `prune --l1` read and maintain it as in Claude Code, but opencode does not load it into its
