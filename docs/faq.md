@@ -12,9 +12,9 @@ The wiki app (Logseq or Obsidian) is still where you *read* the knowledge. The d
 
 ## Do I need a paid Claude plan?
 
-Yes. llm-wiki assumes you are using [Claude Code](https://claude.ai/code), which requires an Anthropic account and a paid plan (Pro or higher). All `/llm-wiki` commands run through Claude Code — there are no external API calls, no vector databases, no separate ingest servers.
+With Claude Code, yes: [Claude Code](https://claude.ai/code) requires an Anthropic account and a paid plan (Pro or higher). All `/llm-wiki` commands run inside the coding agent — there are no external API calls, no vector databases, no separate ingest servers.
 
-Claude Code itself is the only dependency. There is no additional cost for llm-wiki beyond your existing Claude plan.
+The coding agent itself is the only dependency. There is no additional cost for llm-wiki beyond your existing plan. [opencode](https://opencode.ai) runs the same skill as a command with the model provider you configure there (README, "With opencode").
 
 ## Why two layers (L1 and L2)? Isn't one enough?
 
@@ -47,9 +47,9 @@ Bulk migration tooling is on the roadmap. For now, ingesting 20-50 notes manuall
 
 ## Can I use this with ChatGPT or Gemini instead of Claude?
 
-Not currently. The `/llm-wiki` commands rely on Claude Code's skill system and memory architecture. The ingest pipeline, lint rules, and query synthesis are specified against Claude's behavior.
+Through opencode, with any model it supports: `SKILL.md` runs there as a command (README, "With opencode"). The ingest pipeline, lint rules, and query synthesis are specified against Claude's behavior, so results with other models may differ.
 
-Porting to other CLI-based LLM coding tools is on the roadmap but requires significant work — not just the command layer, but the L1 memory semantics and the no-deletion page discipline (current state on top, history collapsed).
+L1 stays Claude Code's memory directory. Under opencode, `/llm-wiki` reads and maintains it, but opencode does not load it into its sessions.
 
 ## What is the difference between this and Karpathy's original gist?
 
@@ -91,7 +91,7 @@ After the first push, the L1/L2 boundary enforces itself. The lint runs catch dr
 
 The plugin. It installs once for all your projects, receives new releases through the marketplace, and knows your wiki location from its "Wiki root" option. Its command is `/llm-wiki <subcommand>`, starting with `/llm-wiki setup`.
 
-The copied skill (copied by hand as described in the README, then `/wiki <command>`) is for setups where plugins are not available. It lives in one project's `.claude/commands/` and stays at the version you copied.
+The copied skill (copied by hand as described in the README, then `/wiki <command>`) is for setups where plugins are not available. It lives in one project's `.claude/commands/` and stays at the version you copied. For opencode, copy it as a command instead (README, "With opencode").
 
 ## Can I use more than one wiki on the same machine?
 

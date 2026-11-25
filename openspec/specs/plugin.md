@@ -4,7 +4,8 @@
 
 llm-wiki is distributed as a Claude Code plugin from its own repository, which also serves as the
 marketplace. The plugin is a single root skill, invoked as `/llm-wiki <subcommand>`, plus the page
-templates the `setup` subcommand renders. It contains no executable files.
+templates the `setup` subcommand renders. It contains no executable files. The same `SKILL.md`
+also runs as an opencode command.
 
 ---
 
@@ -82,6 +83,21 @@ Reason: Anthropic's plugin directory accepts other files only from Verified orga
 - REQ-867: The skill MUST reference bundled files (the templates) through `${CLAUDE_PLUGIN_ROOT}` in the skill body
   and MUST NOT assume the variable exists in the Bash tool's environment.
 
+### opencode command
+
+- REQ-870: `SKILL.md` MUST run unchanged as an opencode command
+  (`~/.config/opencode/commands/<name>.md` or `.opencode/commands/<name>.md`) once its two
+  placeholders are replaced as for a copied skill (setup.md REQ-807).
+- REQ-871: The skill body MUST contain `$ARGUMENTS` exactly once, in the Arguments section. Claude
+  Code and opencode both substitute it with the text after the command name.
+- REQ-872: With an empty argument string, the skill SHALL show the usage block and stop.
+- REQ-873: The skill's behavior MUST NOT depend on frontmatter keys opencode ignores (`name`,
+  `argument-hint`); opencode reads only `description` from a command file.
+- REQ-874: Under opencode, `memory_path` SHALL keep naming Claude Code's memory directory, resolved
+  by the same cwd slug (config.md REQ-621). The skill MUST NOT claim that opencode loads it.
+- REQ-875: The README SHALL describe the opencode install in prose (REQ-835b) and link the opencode
+  commands documentation.
+
 ### State
 
 - REQ-880: The plugin MUST NOT write to `${CLAUDE_PLUGIN_ROOT}`. All state lives in the wiki
@@ -145,6 +161,19 @@ AND every file SHALL be Markdown, text, JSON, YAML or an allowed image
 AND every text file SHALL be UTF-8 without NUL bytes
 ```
 
+### Scenario 8: opencode command
+
+```
+GIVEN SKILL.md copied to ~/.config/opencode/commands/llm-wiki.md
+AND both placeholders replaced: the wiki root ~/notes/wiki and the clone path
+AND ~/notes/wiki/llm-wiki.yml exists
+WHEN the user runs /llm-wiki status in opencode
+THEN the command SHALL read ~/notes/wiki/llm-wiki.yml as its first operation
+AND report the wiki
+WHEN the user runs /llm-wiki without arguments
+THEN the command SHALL show the usage block and change nothing
+```
+
 ---
 
 ## Acceptance Criteria
@@ -157,6 +186,7 @@ AND every text file SHALL be UTF-8 without NUL bytes
 - [ ] `/llm-wiki setup` creates exactly the files of setup.md, byte-identical to v1.7.1
 - [ ] No executable or shebang file in the repository (Scenario 7)
 - [ ] Nothing is written to the plugin directory
+- [ ] `SKILL.md` runs as an opencode command with its arguments (Scenario 8)
 
 ---
 

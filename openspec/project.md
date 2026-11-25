@@ -20,10 +20,10 @@ inspired by CPU memory hierarchies.
 
 ## Tech Stack
 
-- **Runtime:** Claude Code (CLI)
+- **Runtime:** Claude Code (CLI); opencode via the same `SKILL.md` as a command
 - **Distribution:** Claude Code plugin from this repository (which is also the marketplace); a
-  skill copied by hand for installs without the plugin
-- **Dependencies:** none beyond Claude Code; git optional (no scripts, no npm, no pip)
+  skill copied by hand for installs without the plugin, or into opencode as a command
+- **Dependencies:** none beyond Claude Code or opencode; git optional (no scripts, no npm, no pip)
 - **Wiki tools:** Logseq (outliner) or Obsidian (flat markdown)
 - **Config:** `llm-wiki.yml` (YAML)
 - **Format:** Markdown with tool-specific conventions
@@ -34,7 +34,7 @@ inspired by CPU memory hierarchies.
 |------|-----|---------------|
 | Maintainer | Mehmet Goekce | Architecture, releases, specs |
 | Contributors | Open-source community | Features, bug fixes, templates |
-| Users | Claude Code users | Install, configure, use /llm-wiki commands |
+| Users | Claude Code and opencode users | Install, configure, use /llm-wiki commands |
 
 ## Constraints
 
@@ -60,7 +60,7 @@ inspired by CPU memory hierarchies.
 | specs/schema.md | Page types, properties, validation, format rules | 49 | 10 |
 | specs/config.md | Wiki root resolution, llm-wiki.yml loading, validation, error handling | 23 | 11 |
 | specs/setup.md | `setup` subcommand: questions, page and config creation, first commit | 44 | 11 |
-| specs/plugin.md | Plugin manifest, marketplace, root skill `/llm-wiki`, file policy | 24 | 5 |
+| specs/plugin.md | Plugin manifest, marketplace, root skill `/llm-wiki`, file policy, opencode command | 30 | 6 |
 | specs/l1-l2-routing.md | L1/L2 boundary decision logic, L1 staleness | 40 | 11 |
 | specs/git.md | Commit safety in a repo with concurrent writers | 12 | 3 |
-| **Total** | **Complete system coverage** | **351** | **106** |
+| **Total** | **Complete system coverage** | **357** | **107** |

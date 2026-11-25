@@ -40,7 +40,8 @@ that provides a structured knowledge management system for LLM assistants.
 ## Testing
 
 - No test framework (zero-dependency constraint)
-- Manual verification with `claude --plugin-dir .` against test directories
+- Manual verification with `claude --plugin-dir .` against test directories; arguments or
+  frontmatter changes also as an opencode command (plugin.md Scenario 8)
 - Setup changes: compare with the previous release tag via `diff -r` (setup.md Scenario 11)
 - `claude plugin validate . --strict` before a release
 - BDD scenarios from specs serve as manual test scripts

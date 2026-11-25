@@ -6,7 +6,7 @@
 [![Top Language](https://img.shields.io/github/languages/top/MehmetGoekce/llm-wiki)](https://github.com/MehmetGoekce/llm-wiki)
 [![Last Commit](https://img.shields.io/github/last-commit/MehmetGoekce/llm-wiki)](https://github.com/MehmetGoekce/llm-wiki/commits)
 
-Build [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) with Claude Code. Two-layer cache architecture (L1/L2). Supports Logseq and Obsidian.
+Build [Karpathy's LLM Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) with Claude Code or opencode. Two-layer cache architecture (L1/L2). Supports Logseq and Obsidian.
 
 ```mermaid
 graph TB
@@ -94,6 +94,19 @@ Then run `/wiki setup` in that project. The copy is invoked as `/wiki <command>`
 version you copied, and needs the clone to stay where it is. The plugin is the recommended path.
 
 The rest of this README writes `/llm-wiki <command>`. With a copied skill, type `/wiki <command>`.
+
+### With opencode
+
+The same `SKILL.md` runs as an [opencode command](https://opencode.ai/docs/commands/). Keep a local
+copy of this repository as above and copy `SKILL.md` to `~/.config/opencode/commands/llm-wiki.md`
+(all projects) or to `.opencode/commands/llm-wiki.md` in one project. Replace the same two
+placeholders as for a copied skill: `${user_config.wiki_path}` with your wiki root and
+`${CLAUDE_PLUGIN_ROOT}` with your local copy. The file name is the command name, so the copy is
+invoked as `/llm-wiki <command>`.
+
+`memory_path` keeps pointing at Claude Code's memory directory. In opencode, `query`, `lint` and
+`prune --l1` read and maintain it as in Claude Code, but opencode does not load it into its
+sessions; the L1 rules there steer Claude Code only.
 
 ### Moving from a copied skill to the plugin
 
@@ -357,14 +370,14 @@ No system is perfect. Some things to know:
 
 ## Privacy
 
-llm-wiki has no backend and collects nothing. It is a skill and a few shell scripts that run inside your own Claude Code session.
+llm-wiki has no backend and collects nothing. It is a skill that runs inside your own Claude Code or opencode session.
 
 - Wiki pages, the access log and `llm-wiki.yml` are written to your local Logseq graph or Obsidian vault and stay there. Whatever you ingest ends up in those files, including names or contact details if the source contains them.
 - If you set `memory_path`, the skill also reads your local Claude Code memory directory: `query` may consult it, `lint` reports rules that are due for a check, and `prune --l1` classifies, updates, moves or deletes memory files, each one only after you confirm it. `lint` never prints the content of a memory file. Without `memory_path` the skill does not touch that directory.
-- The skill and the scripts send nothing to the author or to any third party. There is no telemetry.
+- The skill sends nothing to the author or to any third party. There is no telemetry.
 - The only network access is the page fetch that `ingest` makes when you pass a URL as the source.
 - Commits are local. Nothing is pushed unless you push your wiki yourself.
-- Claude reads the content you work with in order to do the work. That processing is covered by your own Claude plan and Anthropic's terms, not by this plugin.
+- The model reads the content you work with in order to do the work. That processing is covered by your own plan and your model provider's terms (Anthropic's for Claude), not by this plugin.
 
 ## Credits
 

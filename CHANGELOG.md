@@ -22,6 +22,10 @@ one-line write and batches the page writes into a deliberate drain.
   removed only after its fact is written to a page; unwritten lines stay pending, and the queue is
   never cleared wholesale. An empty queue is a no-op.
 - Ingest-Inbox page templates for Logseq and Obsidian; `/llm-wiki setup` creates the page.
+- **opencode command**: `SKILL.md` runs unchanged as an opencode command once its two placeholders
+  are replaced (README "With opencode"). The skill takes its arguments from `$ARGUMENTS`, which
+  Claude Code and opencode both substitute; without arguments it shows the usage block.
+  `memory_path` keeps naming Claude Code's memory. Spec: `plugin.md` REQ-870-875, Scenario 8.
 - `openspec/specs/git.md` — commit-safety spec (REQ-900..932) covering staging, working-tree
   awareness, history, and setup. Referenced from `ingest.md` REQ-052, `prune.md` REQ-621,
   `lint.md` REQ-203, `setup.md` REQ-810.
